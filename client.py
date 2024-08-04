@@ -83,7 +83,7 @@ def savef(result: list) -> None:
     return 0
 
 class qLearning():
-    def __init__(self, port:int = 2037, state = b'0', reward = -14, load=True, save=True, alpha=0.1, gamma=0.9, loops=90, initial=0, jump_bonus=0): #alpha=1e-1, gamma=0.99
+    def __init__(self, port:int = 2037, state = '0b0', reward = -14, load=True, save=True, alpha=0.1, gamma=0.9, loops=90, initial=0, jump_bonus=0): #alpha=1e-1, gamma=0.99
         '''
         Inicializa a conexão e os parâmetros do algoritmo
         '''
@@ -110,8 +110,9 @@ class qLearning():
             action = self.__most_valued__(self.state)
             self.s.recv(1024).decode()
             new_state, new_reward = cn.get_state_reward(self.s, action)
+            old_state=self.state
             self.state  = new_state
-
+            print(f'{i:03} [state/reward]: [{stringify(old_state)} -> {action}')
     def train(self) -> None:
         '''
         Realiza o treinamento do algoritmo
@@ -121,7 +122,7 @@ class qLearning():
         for j in range(0,self.loops):
             for i in range(0, 99):
                 # Corrigir erro de dados incorretos vindos do jogo
-                # Sem isso, get_state_reward pode retornar os dados do movimento anterior
+                # Sem isso, get_state_reward pode retornar os dados do movimento anterior (penúltimo movimento)
                 self.s.recv(1024).decode()
                 
                 # Política exploratória
@@ -148,14 +149,17 @@ class qLearning():
                     # Punir a ação de ficar no mesmo quadrado
                     reward_received = -0.5
                 
+                # Função Q
                 reward = (1-self.alpha) * self.result[int(self.state, 2)][action] + self.alpha * (reward_received + self.gamma*self.result[int(new_state, 2)][self.__most_valued__(new_state)])
                 
+                # Atualizar tabela
                 self.result[int(self.state, 2)][action] = reward
                 
+                # Atualizar estado atual
+                old_state = self.state
                 self.state = new_state
                 self.reward = new_reward_mod
-
-                print(f'{j:02}{i:03} [state/reward]: [{stringify(self.state)} | {reward_received}]\t~\t{reward}')
+                print(f'{j:02}{i:03} [state/reward]: [{stringify(old_state)} -> {action} | {reward_received}]\t~\t{reward}')
 
             if(self.save):
                 savef(self.result)
