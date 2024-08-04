@@ -22,7 +22,7 @@ def connect(port):
 def get_state_reward(s , act):
     s.send(str(act).encode())
     data = "" 
-    data_recv = False;
+    data_recv = False
     while(not data_recv):
         data = s.recv(1024).decode()
         try:
@@ -30,7 +30,6 @@ def get_state_reward(s , act):
             data_recv = True
         except:
             data_recv = False
-
     #convert the data to decimal int
     estado = data['estado']
     recompensa = data['recompensa']
