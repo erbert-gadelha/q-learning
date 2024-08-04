@@ -1,7 +1,6 @@
 import threading
 import time
 import socket
-from stringify import stringify
 
 
 #Cria a conexao TCP
