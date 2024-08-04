@@ -1,5 +1,6 @@
 import connection as cn
 import random
+import sys
 
 def stringify(platform):
     '''
@@ -165,7 +166,18 @@ class qLearning():
         # print(states)
         return str(list(states.keys())[rank])
 
-
-ql = qLearning(load=True, save=True, alpha=0.05, gamma=0.9, loops=99)
-ql.train()
+if "zerado" in sys.argv:
+    ql = qLearning(load=False, save=True, alpha=0.2, gamma=0.2, loops=30, initial=20)
+    ql.train()
+    ql = qLearning(load=True, save=True, alpha=0.1, gamma=0.7, loops=50)
+    ql.train()
+    while True:
+        ql = qLearning(load=True, save=True, alpha=0.05, gamma=0.9, loops=999)
+        ql.train()
+elif "teste" in sys.argv:
+    ql = qLearning(load=True, save=True, alpha=0.05, gamma=0.9, loops=299)
+    ql.test()
+else:
+    ql = qLearning(load=True, save=True, alpha=0.05, gamma=0.9, loops=299)
+    ql.train()
 
